@@ -18,13 +18,31 @@
 
 from importlib import import_module
 
-_LAZY_SUBMODULES = {"linker", "target_tags"}
+_LAZY_SUBMODULES = {"dma", "linker", "op", "script", "target_tags"}
 
 
 def register_backend():
     """Register Hexagon-owned Python semantics."""
+    from tvm_tirx.tirx.script.ir_builder import (
+        op as builder_op,  # pylint: disable=import-outside-toplevel
+    )
+
     import_module(f"{__name__}.target_tags")
     import_module(f"{__name__}.linker")
+    for name, namespace in script_namespaces().items():
+        builder_op.register_script_namespace(name, namespace)
+
+
+def script_namespaces(**_):
+    """Return Hexagon-owned TVMScript namespaces."""
+    from .script import HexagonNamespace  # pylint: disable=import-outside-toplevel
+
+    return {"hexagon": HexagonNamespace()}
+
+
+def script_namespace(**kwargs):
+    """Return the Hexagon TVMScript namespace object."""
+    return script_namespaces(**kwargs)["hexagon"]
 
 
 def __getattr__(name: str):
@@ -33,4 +51,13 @@ def __getattr__(name: str):
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
-__all__ = ["linker", "register_backend", "target_tags"]
+__all__ = [
+    "dma",
+    "linker",
+    "op",
+    "register_backend",
+    "script",
+    "script_namespace",
+    "script_namespaces",
+    "target_tags",
+]

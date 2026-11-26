@@ -30,6 +30,8 @@ Functions
    :toctree: generated/
 
    register_backend
+   script_namespace
+   script_namespaces
 
 Namespaces
 ----------
@@ -37,4 +39,7 @@ Namespaces
 .. toctree::
    :maxdepth: 1
 
+   backend.hexagon.dma
    backend.hexagon.linker
+   backend.hexagon.op
+   backend.hexagon.script

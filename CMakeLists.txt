@@ -181,6 +181,7 @@ file(GLOB CODEGEN_SRCS CONFIGURE_DEPENDS
   src/backend/cuda/tile/*.cc
   src/backend/cuda/layout/*.cc
   src/backend/hexagon/codegen/*.cc
+  src/backend/hexagon/op/*.cc
   src/backend/metal/codegen/*.cc
   src/backend/metal/op/*.cc
   src/backend/opencl/codegen/*.cc
