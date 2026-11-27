@@ -18,7 +18,7 @@
 
 from importlib import import_module
 
-_LAZY_SUBMODULES = {"dma", "linker", "op", "script", "target_tags"}
+_LAZY_SUBMODULES = {"dma", "hvx", "linker", "op", "script", "target_tags"}
 
 
 def register_backend():
@@ -35,13 +35,15 @@ def register_backend():
 
 def script_namespaces(**_):
     """Return Hexagon-owned TVMScript namespaces."""
-    from .script import HexagonNamespace  # pylint: disable=import-outside-toplevel
+    # pylint: disable=import-outside-toplevel
+    from .hvx import HVXNamespace
+    from .script import HexagonNamespace
 
-    return {"hexagon": HexagonNamespace()}
+    return {"hexagon": HexagonNamespace(), "hvx": HVXNamespace()}
 
 
 def script_namespace(**kwargs):
-    """Return the Hexagon TVMScript namespace object."""
+    """Return the ``T.hexagon`` namespace object."""
     return script_namespaces(**kwargs)["hexagon"]
 
 
@@ -53,6 +55,7 @@ def __getattr__(name: str):
 
 __all__ = [
     "dma",
+    "hvx",
     "linker",
     "op",
     "register_backend",

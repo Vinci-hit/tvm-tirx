@@ -40,6 +40,7 @@ Namespaces
    :maxdepth: 1
 
    backend.hexagon.dma
+   backend.hexagon.hvx
    backend.hexagon.linker
    backend.hexagon.op
    backend.hexagon.script
