@@ -45,27 +45,29 @@ Write ``T.k`` for the k-th event of thread ``T`` in program order.
 
 ``dma_push`` at ``T.k`` creates job ``J`` with sequence number ``n`` (the
 number of earlier pushes by ``T``).
-  * ``J`` reads ``nrows`` rows of ``row_size`` bytes from ``src``, row ``r``
-    starting at ``src + r * src_stride``.
-  * ``J`` writes the same shape to ``dst``, row ``r`` starting at
-    ``dst + r * dst_stride``.
-  * Edge ``T.k -> J.start``: memory written by ``T`` before the push is visible
-    to the copy (llama.cpp issues ``release`` before ``dmlink``).
-  * No edge from ``J`` to any later event of ``T``.  Until the matching pop,
-    every access of ``T`` to the source or destination region is a race
-    candidate.
-  * No edge between two jobs of the same queue.  Completions are *observed* in
-    FIFO order, but the model does not assume that the transfers themselves
-    are serialized, so two in-flight jobs that write overlapping bytes, or where
-    one writes what the other reads, race.
-  * ``nrows == 0`` is a dummy push: it occupies a queue slot and must be popped,
-    but touches no memory.  llama.cpp uses it to recycle buffer slots.
+
+* ``J`` reads ``nrows`` rows of ``row_size`` bytes from ``src``, row ``r``
+  starting at ``src + r * src_stride``.
+* ``J`` writes the same shape to ``dst``, row ``r`` starting at
+  ``dst + r * dst_stride``.
+* Edge ``T.k -> J.start``: memory written by ``T`` before the push is visible
+  to the copy (llama.cpp issues ``release`` before ``dmlink``).
+* No edge from ``J`` to any later event of ``T``.  Until the matching pop,
+  every access of ``T`` to the source or destination region is a race
+  candidate.
+* No edge between two jobs of the same queue.  Completions are *observed* in
+  FIFO order, but the model does not assume that the transfers themselves
+  are serialized, so two in-flight jobs that write overlapping bytes, or where
+  one writes what the other reads, race.
+* ``nrows == 0`` is a dummy push: it occupies a queue slot and must be popped,
+  but touches no memory.  llama.cpp uses it to recycle buffer slots.
 
 ``dma_pop`` at ``T.k`` consumes the oldest outstanding job ``J``.
-  * Edge ``J.end -> T.k``: everything ``J`` wrote is visible to ``T`` after the
-    pop, and ``J`` no longer touches its regions.
-  * Popping an empty queue is a protocol error.  (llama.cpp silently returns a
-    zero ``dma_data``; agent-written code that does this is always a bug.)
+
+* Edge ``J.end -> T.k``: everything ``J`` wrote is visible to ``T`` after the
+  pop, and ``J`` no longer touches its regions.
+* Popping an empty queue is a protocol error.  (llama.cpp silently returns a
+  zero ``dma_data``; agent-written code that does this is always a bug.)
 
 ``dma_flush`` at ``T.k`` consumes every outstanding job, oldest first, with an
 edge ``J.end -> T.k`` for each.  Flushing an empty queue is allowed.

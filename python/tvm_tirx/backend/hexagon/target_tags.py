@@ -40,6 +40,12 @@ _HEXAGON_VERSIONS = {
         "vtcm": 8 * _ONE_MB,
         "mattr": ["+hvxv75", "+hvx-length128b", "+hvx-qfloat", "-hvx-ieee-fp"],
     },
+    # Snapdragon 8 Elite (SM8750). IEEE half and single float are on next to
+    # qfloat, because HVX code for this chip uses both, as llama.cpp does.
+    "v79": {
+        "vtcm": 8 * _ONE_MB,
+        "mattr": ["+hvxv79", "+hvx-length128b", "+hvx-qfloat", "+hvx-ieee-fp"],
+    },
 }
 
 for _ver, _info in _HEXAGON_VERSIONS.items():
